@@ -2,6 +2,7 @@ from ortools.constraint_solver.pywrapcp import BooleanVar
 from ortools.sat.python import cp_model
 from ortools.sat.python.cp_model import CpModel, IntVar
 
+from qualifier import Qualifier
 from region import Region
 from teams import Team, TeamDatabase
 from tournament import SolvedTournament
@@ -22,7 +23,7 @@ class EPT:
         total_points = [model.NewIntVar(0, 99999, f'd_{i}') for i in team_count_range]
         for t in self.team_database.get_all_teams():
             team_index = self.team_database.get_team_index(t)
-            total_points[team_index] = dreamleague_season_24.points[team_index]
+            total_points[team_index] = dreamleague_season_24.points[team_index] + dreamleague_season_24.gs1_points[team_index]
 
         # Ranks
         aux: [[BooleanVar]] = {(i, j): model.NewBoolVar(f'aux_{i}_{j}') for i in team_count_range for j in
@@ -95,22 +96,48 @@ def main():
                                                                                               "BetBoom Team",
                                                                                               "Gaimin Gladiators",
                                                                                               "Xtreme Gaming"),
-                                               qualifier={
-                                                   Region.NA: team_database.get_teams_by_names("Nouns Esports"),
-                                                   Region.SA: team_database.get_teams_by_names("HEROIC", "beastcoast"),
-                                                   Region.WEU: team_database.get_teams_by_names("Team Liquid",
-                                                                                                "Tundra Esports",
-                                                                                                "Cloud9"),
-                                                   Region.EEU: team_database.get_teams_by_names("Team Spirit", "1win"),
-                                                   Region.MESWA: team_database.get_teams_by_names("PSG Quest"),
-                                                   Region.CHINA: team_database.get_teams_by_names("Azure Ray"),
-                                                   Region.SEA: team_database.get_teams_by_names("Aurora Gaming",
-                                                                                                "Talon Esports")
+                                               qualifiers={
+                                                   Region.NA: Qualifier(
+                                                       region=Region.NA,
+                                                       teams=team_database.get_teams_by_names("Nouns Esports"),
+                                                       num_qualified=1
+                                                   ),
+                                                   Region.SA: Qualifier(
+                                                       region=Region.SA,
+                                                       teams=team_database.get_teams_by_names("HEROIC", "beastcoast"),
+                                                       num_qualified=2
+                                                   ),
+                                                   Region.WEU: Qualifier(
+                                                       region=Region.WEU,
+                                                       teams=team_database.get_teams_by_names("Team Liquid",
+                                                                                              "Tundra Esports",
+                                                                                              "Cloud9"),
+                                                       num_qualified=3
+                                                   ),
+                                                   Region.EEU: Qualifier(
+                                                       region=Region.EEU,
+                                                       teams=team_database.get_teams_by_names("Team Spirit", "1win"),
+                                                       num_qualified=2
+                                                   ),
+                                                   Region.MESWA: Qualifier(
+                                                       region=Region.MESWA,
+                                                       teams=team_database.get_teams_by_names("PSG Quest"),
+                                                       num_qualified=1
+                                                   ),
+                                                   Region.CHINA: Qualifier(
+                                                       region=Region.CHINA,
+                                                       teams=team_database.get_teams_by_names("Azure Ray"),
+                                                       num_qualified=1
+                                                   ),
+                                                   Region.SEA: Qualifier(
+                                                       region=Region.SEA,
+                                                       teams=team_database.get_teams_by_names("Aurora Gaming",
+                                                                                              "Talon Esports"),
+                                                       num_qualified=2
+                                                   )
                                                },
                                                points=[3000, 2500, 2000, 1600, 1200, 1000, 600, 400, 250, 250, 125, 125,
-                                                       70, 70, 30, 30],
-                                               gs1_points=[300],
-                                               gs2_points=[300, 150, 75],
+                                                       70, 70, 30, 30], gs1_points=[300], gs2_points=[300, 150, 75],
                                                team_database=team_database),
         team_database=team_database
     )

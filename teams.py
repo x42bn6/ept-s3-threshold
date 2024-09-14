@@ -21,7 +21,7 @@ class TeamDatabase:
         return self.teams[team_name]
 
     def get_teams_by_names(self, *team_names: str) -> [Team]:
-        return map(self.get_team_by_name, team_names)
+        return list(map(self.get_team_by_name, team_names))
 
     def get_team_index(self, team: Team) -> int:
         return list(self.teams.keys()).index(team.name)

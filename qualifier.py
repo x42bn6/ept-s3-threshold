@@ -1,8 +1,10 @@
+from region import Region
 from teams import Team
 
 
 class Qualifier:
-    def __init__(self, teams: [Team], num_qualified: int):
+    def __init__(self, region: Region, teams: [Team], num_qualified: int):
+        self.region = region
         self.teams = teams
         self.num_qualified = num_qualified
 
