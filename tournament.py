@@ -89,6 +89,11 @@ class SolvedTournament:
             for placement in range(self.team_count):
                 model.Add(sum(gs1_indicators[i][placement] for i in range(self.team_count)) == 1)
 
+        # Bind stages together such that if you are in the tournament, you are in GS1
+        for team in self.team_database.get_all_teams():
+            team_index = self.team_database.get_team_index(team)
+            model.Add(sum(indicators[team_index]) == sum(gs1_indicators[team_index]))
+
         # Points
         # Overall
         # d variable
