@@ -33,6 +33,7 @@ class Display:
 
         print("Printing Liquipedia table")
         print()
+        print("==What does the threshold scenario look like?==")
         print(
             f"This is the following scenario where {{{{Team|{team_to_optimise.name}}}}} fail to qualify with {round(max_points)} points.")
         print('{| class="wikitable" style="font-size:85%; text-align: center;"')
