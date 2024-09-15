@@ -37,18 +37,19 @@ class Display:
         print(
             f"This is the following scenario where {{{{Team|{team_to_optimise.name}}}}} fail to qualify with {round(max_points)} points.")
         print('{| class="wikitable" style="font-size:85%; text-align: center;"')
-        print("!rowspan=\"2\" style=\"min-width:40px\"|'''Place'''")
-        print("!rowspan=\"2\" style=\"min-width:200px\"|'''Team'''")
-        print("!rowspan=\"2\" style=\"min-width:50px\"|'''Point'''")
+        print("!rowspan=\"2\" style=\"min-width:40px\"| '''Place'''")
+        print("!rowspan=\"2\" style=\"min-width:200px\"| '''Team'''")
+        print("!style=\"min-width:50px\"| '''Point'''")
         print(
             f"! colspan=\"{unoptimised_model.dreamleague_season_24.points_scoring_phases}\" style=\"min-width:50px\"|{unoptimised_model.dreamleague_season_24.icon}")
         print("|-")
+        print(f"| '''{(sorted_team_rows[7].total_points + 1)}'''")
         if unoptimised_model.dreamleague_season_24.points_scoring_phases == 1:
-            print("|Overall")
+            print("| Overall")
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 2:
-            print("|Overall||GS1")
+            print("| Overall || GS1")
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 3:
-            print("|Overall||GS1||GS2")
+            print("| Overall || GS1 || GS2")
         else:
             raise Exception(f"Unknown number of points scoring phases {unoptimised_model.dreamleague_season_24.points_scoring_phases}")
         print("|-")
