@@ -2,8 +2,10 @@ from ortools.constraint_solver.pywrapcp import BooleanVar, IntVar
 
 
 class UnoptimisedTournamentModel:
-    def __init__(self, indicators: [[BooleanVar]], points: [IntVar], gs1_indicators: [[BooleanVar]] = None,
+    def __init__(self, icon: str, points_scoring_phases: int, indicators: [[BooleanVar]], points: [IntVar], gs1_indicators: [[BooleanVar]] = None,
                  gs1_points: [IntVar] = None, gs2_indicators: [[BooleanVar]] = None, gs2_points: [IntVar] = None):
+        self.icon = icon
+        self.points_scoring_phases = points_scoring_phases
         self.indicators = indicators
         self.points = points
         self.gs1_indicators = gs1_indicators
