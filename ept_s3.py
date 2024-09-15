@@ -39,7 +39,6 @@ def main():
     for team in teams:
         team_database.add_team(team)
 
-    model = CpModel()
     ept: EPT = EPT(
         dreamleague_season_24=SolvedTournament(name="DreamLeague Season 24", link="DreamLeague/Season 24",
                                                icon="{{LeagueIconSmall/dreamleague|name=DreamLeague Season 24|link=DreamLeague/Season 24|date=2024-11-10}}",
@@ -97,17 +96,31 @@ def main():
                                                team_database=team_database),
         team_database=team_database
     )
-    unoptimised_model = ept.add_constraints(model)
 
-    # Optimise
-    team_to_optimise = team_database.get_team_by_name("Gaimin Gladiators")
-    [solver, status] = ept.optimise_for(team=team_to_optimise,
-                                        unoptimised_model=unoptimised_model, model=model)
+    max_objective_value = -1
+    max_solver = None
+    max_team = None
+    for team in team_database.get_all_teams():
+        print(f"Now optimising for {team.name}")
+        model = CpModel()
+        unoptimised_model = ept.add_constraints(model)
 
-    if status == cp_model.OPTIMAL:
-        display = Display()
-        display.print(team_to_optimise=team_to_optimise, max_points=solver.objective_value, unoptimised_model=unoptimised_model,
-                      solver=solver, team_database=team_database)
+        # Optimise
+        [solver, status] = ept.optimise_for(team=team,
+                                            unoptimised_model=unoptimised_model, model=model)
+
+        if status != cp_model.OPTIMAL:
+            print(f"Team {team.name} probably cannot finish in top 8")
+            continue
+
+        if solver.objective_value > max_objective_value:
+            max_objective_value = solver.objective_value
+            max_solver = solver
+            max_team = team
+
+    display = Display()
+    display.print(team_to_optimise=max_team, max_points=max_objective_value, unoptimised_model=unoptimised_model,
+                  solver=max_solver, team_database=team_database)
 
 
 print("Executing solver")
