@@ -79,11 +79,6 @@ class SolvedTournament:
         # Bottom GS1 = final result
         for team in self.team_database.get_all_teams():
             team_index = self.team_database.get_team_index(team)
-
-            gs1_bottom_8 = model.new_bool_var(f"{self.name}_{team_index}_gs1_bottom_8")
-            model.Add(sum(gs1_indicators[team_index][8:16]) == 1).only_enforce_if(gs1_bottom_8)
-            model.Add(sum(gs1_indicators[team_index][8:16]) == 0).only_enforce_if(gs1_bottom_8.Not())
-
             for p in range(8, 16):
                 model.Add(indicators[team_index][p] == gs1_indicators[team_index][p])
 
@@ -108,6 +103,15 @@ class SolvedTournament:
 
             model.Add(sum(gs2_indicators[team_index]) == 1).only_enforce_if(gs1_top_8)
             model.Add(sum(gs2_indicators[team_index]) == 0).only_enforce_if(not_qualified_or_gs1_bottom_8)
+
+        # If you finish in the top 4 of GS2, you finish top 4 overall
+        for team in self.team_database.get_all_teams():
+            team_index = self.team_database.get_team_index(team)
+            gs2_top_4 = model.new_bool_var(f"{self.name}_{team_index}_gs2_top_4")
+            model.Add(sum(gs2_indicators[team_index][0:4]) == 1).only_enforce_if(gs2_top_4)
+            model.Add(sum(gs2_indicators[team_index][0:4]) == 0).only_enforce_if(gs2_top_4.Not())
+            model.Add(sum(indicators[team_index][0:4]) == 1).only_enforce_if(gs2_top_4)
+            model.Add(sum(indicators[team_index][0:4]) == 0).only_enforce_if(gs2_top_4.Not())
 
         points_scoring_phases = 1
         if self.gs1_team_count is not None:
