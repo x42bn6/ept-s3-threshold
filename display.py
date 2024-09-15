@@ -43,7 +43,7 @@ class Display:
         print(
             f"! colspan=\"{unoptimised_model.dreamleague_season_24.points_scoring_phases}\" style=\"min-width:50px\"|{unoptimised_model.dreamleague_season_24.icon}")
         print("|-")
-        print(f"| '''{(sorted_team_rows[7].total_points + 1)}'''")
+        print(f"| '''{(round(max_points) + 1)}'''")
         if unoptimised_model.dreamleague_season_24.points_scoring_phases == 1:
             print("| Overall")
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 2:
