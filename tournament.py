@@ -24,12 +24,31 @@ class ResolvedTournament:
         self.results = results
 
 
+class TeamConstraint:
+    def __init__(self, team: Team, best: int, worst: int):
+        self.team = team
+        self.best = best
+        self.worst = worst
+
+
 class SolvedTournament:
-    def __init__(self, name: str = None, link: str = None, icon: str = None, gs1_team_count: int = None,
-                 gs2_team_count: int = None, team_count: int = -1, invited_teams: [Team] = None,
-                 qualifiers: dict[Region, Qualifier] = None, points: [int] = None, gs1_points: [int] = None,
-                 gs2_points: [int] = None, gs1_a_teams: [Team] = None, gs1_b_teams: [Team] = None,
-                 gs2_teams: [Team] = None, team_database: TeamDatabase = None):
+    def __init__(self,
+                 name: str = None,
+                 link: str = None,
+                 icon: str = None,
+                 gs1_team_count: int = None,
+                 gs2_team_count: int = None,
+                 playoff_team_count: int = None,
+                 team_count: int = -1,
+                 invited_teams: [Team] = None,
+                 qualifiers: dict[Region, Qualifier] = None,
+                 points: [int] = None,
+                 gs1_points: [int] = None,
+                 gs2_points: [int] = None,
+                 gs1_a_teams: [Team] = None,
+                 gs1_b_teams: [Team] = None,
+                 gs2_teams: [Team] = None,
+                 team_database: TeamDatabase = None):
         self.name = name
         self.link = link
         self.icon = icon
@@ -37,6 +56,7 @@ class SolvedTournament:
         self.team_count = team_count
         self.gs1_team_count = gs1_team_count
         self.gs2_team_count = gs2_team_count
+        self.playoff_team_count = playoff_team_count
 
         self.invited_teams = invited_teams
         self.qualifiers = qualifiers
@@ -50,6 +70,8 @@ class SolvedTournament:
         self.gs2_points = gs2_points
 
         self.team_database = team_database
+
+        self.team_constraints: [TeamConstraint] = []
 
     def add_constraints(self, model: CpModel) -> UnoptimisedTournamentModel:
         # x variable
@@ -79,39 +101,49 @@ class SolvedTournament:
         # Bottom GS1 = final result
         for team in self.team_database.get_all_teams():
             team_index = self.team_database.get_team_index(team)
-            for p in range(8, 16):
+            for p in range(self.gs1_team_count, self.team_count):
                 model.Add(indicators[team_index][p] == gs1_indicators[team_index][p])
 
-        # Anyone who finished bottom 4 in GS 1 (e.g. 8-16) cannot be in GS2
+        # Anyone who finished bottom half in GS 1 (e.g. 8-16) cannot be in GS2
         for team in self.team_database.get_all_teams():
             team_index = self.team_database.get_team_index(team)
             qualified_for_tournament = model.new_bool_var(f"{self.name}_{team_index}_qualified_for_tournament")
             model.Add(sum(indicators[team_index]) == 1).only_enforce_if(qualified_for_tournament)
             model.Add(sum(indicators[team_index]) == 0).only_enforce_if(qualified_for_tournament.Not())
 
-            gs1_top_8 = model.new_bool_var(f"{self.name}_{team_index}_gs1_top_8")
-            model.Add(sum(gs1_indicators[team_index][0:8]) == 1).only_enforce_if(gs1_top_8)
-            model.Add(sum(gs1_indicators[team_index][0:8]) == 0).only_enforce_if(gs1_top_8.Not())
+            gs1_top = model.new_bool_var(f"{self.name}_{team_index}_gs1_top")
+            model.Add(sum(gs1_indicators[team_index][0:self.gs1_team_count]) == 1).only_enforce_if(gs1_top)
+            model.Add(sum(gs1_indicators[team_index][0:self.gs1_team_count]) == 0).only_enforce_if(gs1_top.Not())
 
-            gs1_bottom_8 = model.new_bool_var(f"{self.name}_{team_index}_gs1_bottom_8")
-            model.Add(sum(gs1_indicators[team_index][8:16]) == 1).only_enforce_if(gs1_bottom_8)
-            model.Add(sum(gs1_indicators[team_index][8:16]) == 0).only_enforce_if(gs1_bottom_8.Not())
+            gs1_bottom = model.new_bool_var(f"{self.name}_{team_index}_gs1_bottom")
+            model.Add(sum(gs1_indicators[team_index][self.gs1_team_count:self.team_count]) == 1).only_enforce_if(
+                gs1_bottom)
+            model.Add(sum(gs1_indicators[team_index][self.gs1_team_count:self.team_count]) == 0).only_enforce_if(
+                gs1_bottom.Not())
 
-            not_qualified_or_gs1_bottom_8 = model.new_bool_var(f"{self.name}_{team_index}_not_qualified_or_gs1_bottom_8")
-            model.AddBoolOr([qualified_for_tournament.Not(), gs1_bottom_8]).only_enforce_if(not_qualified_or_gs1_bottom_8)
-            model.AddBoolAnd([qualified_for_tournament, gs1_bottom_8.Not()]).only_enforce_if(not_qualified_or_gs1_bottom_8.Not())
+            not_qualified_or_gs1_bottom = model.new_bool_var(f"{self.name}_{team_index}_not_qualified_or_gs1_bottom")
+            model.AddBoolOr([qualified_for_tournament.Not(), gs1_bottom]).only_enforce_if(not_qualified_or_gs1_bottom)
+            model.AddBoolAnd([qualified_for_tournament, gs1_bottom.Not()]).only_enforce_if(
+                not_qualified_or_gs1_bottom.Not())
 
-            model.Add(sum(gs2_indicators[team_index]) == 1).only_enforce_if(gs1_top_8)
-            model.Add(sum(gs2_indicators[team_index]) == 0).only_enforce_if(not_qualified_or_gs1_bottom_8)
+            model.Add(sum(gs2_indicators[team_index]) == 1).only_enforce_if(gs1_top)
+            model.Add(sum(gs2_indicators[team_index]) == 0).only_enforce_if(not_qualified_or_gs1_bottom)
 
-        # If you finish in the top 4 of GS2, you finish top 4 overall
+        # If you finish in the top half of GS2, you finish top 4 overall
         for team in self.team_database.get_all_teams():
             team_index = self.team_database.get_team_index(team)
             gs2_top_4 = model.new_bool_var(f"{self.name}_{team_index}_gs2_top_4")
-            model.Add(sum(gs2_indicators[team_index][0:4]) == 1).only_enforce_if(gs2_top_4)
-            model.Add(sum(gs2_indicators[team_index][0:4]) == 0).only_enforce_if(gs2_top_4.Not())
-            model.Add(sum(indicators[team_index][0:4]) == 1).only_enforce_if(gs2_top_4)
-            model.Add(sum(indicators[team_index][0:4]) == 0).only_enforce_if(gs2_top_4.Not())
+            model.Add(sum(gs2_indicators[team_index][0:self.playoff_team_count]) == 1).only_enforce_if(gs2_top_4)
+            model.Add(sum(gs2_indicators[team_index][0:self.playoff_team_count]) == 0).only_enforce_if(gs2_top_4.Not())
+            model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 1).only_enforce_if(gs2_top_4)
+            model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 0).only_enforce_if(gs2_top_4.Not())
+
+        # Team constraints
+        for team_constraint in self.team_constraints:
+            team_sum = 0
+            for i in range(team_constraint.best, team_constraint.worst + 1):
+                team_sum += indicators[self.team_database.get_team_index(team_constraint.team)][i]
+            model.Add(team_sum == 1)
 
         points_scoring_phases = 1
         if self.gs1_team_count is not None:
@@ -147,7 +179,7 @@ class SolvedTournament:
                 team_index = self.team_database.get_team_index(team)
                 row_sum = 0
                 for placement in range(0, self.gs1_team_count * 2, 2):
-                    row_sum += gs1_indicators[team_index]
+                    row_sum += gs1_indicators[team_index][placement]
                 model.Add(row_sum == 1)
 
             # B finishes 2nd, 4th, 6th, etc.
@@ -155,12 +187,13 @@ class SolvedTournament:
                 team_index = self.team_database.get_team_index(team)
                 row_sum = 0
                 for placement in range(1, self.gs1_team_count * 2, 2):
-                    row_sum += gs1_indicators[team_index]
+                    row_sum += gs1_indicators[team_index][placement]
                 model.Add(row_sum == 1)
 
             # One placement per team
             for placement in range(self.team_count):
-                model.Add(sum(gs1_indicators[i][placement] for i in range(len(self.team_database.get_all_teams()))) == 1)
+                model.Add(
+                    sum(gs1_indicators[i][placement] for i in range(len(self.team_database.get_all_teams()))) == 1)
 
         # d variable
         gs1_obtained_points: [IntVar] = [model.new_int_var(0, 99999, f'd_{self.name}_gs1_{i}')
@@ -199,7 +232,8 @@ class SolvedTournament:
 
             # One placement per team
             for placement in range(self.team_count):
-                model.Add(sum(gs2_indicators[i][placement] for i in range(len(self.team_database.get_all_teams()))) == 1)
+                model.Add(
+                    sum(gs2_indicators[i][placement] for i in range(len(self.team_database.get_all_teams()))) == 1)
         # d variable
         gs2_obtained_points: [IntVar] = [model.new_int_var(0, 99999, f'd_{self.name}_gs2_{i}')
                                          for i in range(all_team_count)]
@@ -230,3 +264,7 @@ class SolvedTournament:
         # One placement per team
         for placement in range(self.team_count):
             model.Add(sum(indicators[i][placement] for i in range(len(self.team_database.get_all_teams()))) == 1)
+
+    def team_can_finish_between(self, team_name: str, best: int, worst: int):
+        team = self.team_database.get_team_by_name(team_name)
+        self.team_constraints.append(TeamConstraint(team=team, best=best - 1, worst=worst - 1))

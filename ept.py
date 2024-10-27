@@ -17,7 +17,6 @@ class EPT:
 
         team_count = len(self.team_database.get_all_teams())
         team_count_range = range(team_count)
-
         total_points = [model.NewIntVar(0, 99999, f'd_{i}') for i in team_count_range]
         for t in self.team_database.get_all_teams():
             team_index = self.team_database.get_team_index(t)
