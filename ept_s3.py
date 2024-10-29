@@ -107,6 +107,7 @@ def main():
                                              team_database=team_database)
 
     dreamleague_season_24.team_can_finish_between_gs1("Team Falcons", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("HEROIC", 13, 16)
     dreamleague_season_24.team_can_finish_between_gs1("Palianytsia", 13, 16)
 
     ept: EPT = EPT(
