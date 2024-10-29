@@ -72,6 +72,8 @@ class SolvedTournament:
         self.team_database = team_database
 
         self.team_constraints: [TeamConstraint] = []
+        self.team_gs1_constraints: [TeamConstraint] = []
+        self.team_gs2_constraints: [TeamConstraint] = []
 
     def add_constraints(self, model: CpModel) -> UnoptimisedTournamentModel:
         # x variable
@@ -143,6 +145,20 @@ class SolvedTournament:
             team_sum = 0
             for i in range(team_constraint.best, team_constraint.worst + 1):
                 team_sum += indicators[self.team_database.get_team_index(team_constraint.team)][i]
+            model.Add(team_sum == 1)
+
+        # GS1 constraints
+        for team_gs1_constraint in self.team_gs1_constraints:
+            team_sum = 0
+            for i in range(team_gs1_constraint.best, team_gs1_constraint.worst + 1):
+                team_sum += gs1_indicators[self.team_database.get_team_index(team_gs1_constraint.team)][i]
+            model.Add(team_sum == 1)
+
+        # GS2 constraints
+        for team_gs2_constraint in self.team_gs2_constraints:
+            team_sum = 0
+            for i in range(team_gs2_constraint.best, team_gs2_constraint.worst + 1):
+                team_sum += gs2_indicators[self.team_database.get_team_index(team_gs2_constraint.team)][i]
             model.Add(team_sum == 1)
 
         points_scoring_phases = 1
@@ -266,5 +282,14 @@ class SolvedTournament:
             model.Add(sum(indicators[i][placement] for i in range(len(self.team_database.get_all_teams()))) == 1)
 
     def team_can_finish_between(self, team_name: str, best: int, worst: int):
+        self.team_can_finish_between_inner(team_name, best, worst, self.team_constraints)
+
+    def team_can_finish_between_gs1(self, team_name: str, best: int, worst: int):
+        self.team_can_finish_between_inner(team_name, best, worst, self.team_gs1_constraints)
+
+    def team_can_finish_between_gs2(self, team_name: str, best: int, worst: int):
+        self.team_can_finish_between_inner(team_name, best, worst, self.team_gs2_constraints)
+
+    def team_can_finish_between_inner(self, team_name: str, best: int, worst: int, constraints: [TeamConstraint]):
         team = self.team_database.get_team_by_name(team_name)
-        self.team_constraints.append(TeamConstraint(team=team, best=best - 1, worst=worst - 1))
+        constraints.append(TeamConstraint(team=team, best=best - 1, worst=worst - 1))
