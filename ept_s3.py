@@ -136,8 +136,12 @@ def main():
             max_team = team
 
     display = Display()
-    display.print(team_to_optimise=max_team, max_points=max_objective_value, unoptimised_model=unoptimised_model,
-                  solver=max_solver, team_database=team_database)
+    display.print(team_to_optimise=max_team,
+                  max_points=max_objective_value,
+                  unoptimised_model=unoptimised_model,
+                  solver=max_solver,
+                  dreamleague_season_24=dreamleague_season_24,
+                  team_database=team_database)
 
 
 print("Executing solver")
