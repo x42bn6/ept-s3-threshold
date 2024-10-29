@@ -63,13 +63,13 @@ class Display:
         print(
             f"! colspan=\"{unoptimised_model.dreamleague_season_24.points_scoring_phases}\" style=\"min-width:50px\"|{unoptimised_model.dreamleague_season_24.icon}")
         print("|-")
-        print(f"| '''{(round(max_points) + 1)}'''")
+        print(f"! '''{(round(max_points) + 1)}'''")
         if unoptimised_model.dreamleague_season_24.points_scoring_phases == 1:
-            print("| Overall")
+            print("! Overall")
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 2:
-            print("| Overall || GS1")
+            print("! Overall || GS1")
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 3:
-            print("| Overall || GS1 || GS2")
+            print("! Overall || GS1 || GS2")
         else:
             raise Exception(f"Unknown number of points scoring phases {unoptimised_model.dreamleague_season_24.points_scoring_phases}")
         print("|-")
