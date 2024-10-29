@@ -39,8 +39,8 @@ def main():
     for team in teams:
         team_database.add_team(team)
 
-    dreamleague_season_24 = SolvedTournament(name="DreamLeague Season 22", link="DreamLeague/Season 22",
-                                             icon="{{LeagueIconSmall/dreamleague|name=DreamLeague Season 22|link=DreamLeague/Season 22|date=2024-11-10}}",
+    dreamleague_season_24 = SolvedTournament(name="DreamLeague Season 24", link="DreamLeague/Season 24",
+                                             icon="{{LeagueIconSmall/dreamleague|name=DreamLeague Season 24|link=DreamLeague/Season 24|date=2024-11-10}}",
                                              team_count=16,
                                              invited_teams=team_database.get_teams_by_names("Team Liquid",
                                                                                             "Gaimin Gladiators",
@@ -106,6 +106,7 @@ def main():
 
                                              team_database=team_database)
 
+    dreamleague_season_24.team_can_finish_between_gs1("Team Falcons", 1, 8)
     dreamleague_season_24.team_can_finish_between_gs1("Palianytsia", 13, 16)
 
     ept: EPT = EPT(
