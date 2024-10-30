@@ -81,8 +81,8 @@ def main():
                                              points=[3000, 2500, 2000, 1600, 1200, 1000, 600, 400, 250, 250, 125, 125,
                                                      70, 70, 30,
                                                      30],
-                                             gs1_points=[300],
-                                             gs2_points=[300, 150, 75],
+                                             gs1_points=[300, 150, 75],
+                                             gs2_points=[300],
                                              gs1_team_count=8,
                                              gs2_team_count=8,
                                              playoff_team_count=4,
@@ -108,21 +108,21 @@ def main():
 
     dreamleague_season_24.team_can_finish_between_gs1("PARIVISION", 1, 2)
     dreamleague_season_24.team_can_finish_between_gs1("Team Liquid", 3, 4)
-    dreamleague_season_24.team_can_finish_between_gs1("Xtreme Gaming", 5, 8)
-    dreamleague_season_24.team_can_finish_between_gs1("BetBoom Team", 5, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("Xtreme Gaming", 5, 6)
+    dreamleague_season_24.team_can_finish_between_gs1("BetBoom Team", 7, 8)
     dreamleague_season_24.team_can_finish_between_gs1("Gaimin Gladiators", 9, 10)
     dreamleague_season_24.team_can_finish_between_gs1("AVULUS", 11, 12)
-    dreamleague_season_24.team_can_finish_between_gs1("Nigma Galaxy", 13, 16)
-    dreamleague_season_24.team_can_finish_between_gs1("Nouns Esports", 13, 16)
+    dreamleague_season_24.team_can_finish_between_gs1("Nigma Galaxy", 13, 14)
+    dreamleague_season_24.team_can_finish_between_gs1("Nouns Esports", 15, 16)
 
-    dreamleague_season_24.team_can_finish_between_gs1("Team Falcons", 1, 8)
-    dreamleague_season_24.team_can_finish_between_gs1("Team Waska", 1, 8)
-    dreamleague_season_24.team_can_finish_between_gs1("Tundra Esports", 1, 8)
-    dreamleague_season_24.team_can_finish_between_gs1("Team Spirit", 1, 8)
-    dreamleague_season_24.team_can_finish_between_gs1("Talon Esports", 9, 16)
-    dreamleague_season_24.team_can_finish_between_gs1("Azure Ray", 9, 16)
-    dreamleague_season_24.team_can_finish_between_gs1("HEROIC", 13, 16)
-    dreamleague_season_24.team_can_finish_between_gs1("Palianytsia", 13, 16)
+    dreamleague_season_24.team_can_finish_between_gs1("Team Falcons", 1, 2)
+    dreamleague_season_24.team_can_finish_between_gs1("Team Waska", 3, 4)
+    dreamleague_season_24.team_can_finish_between_gs1("Tundra Esports", 5, 6)
+    dreamleague_season_24.team_can_finish_between_gs1("Team Spirit", 7, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("Talon Esports", 9, 10)
+    dreamleague_season_24.team_can_finish_between_gs1("Azure Ray", 11, 12)
+    dreamleague_season_24.team_can_finish_between_gs1("HEROIC", 13, 14)
+    dreamleague_season_24.team_can_finish_between_gs1("Palianytsia", 15, 16)
 
     ept: EPT = EPT(
         dreamleague_season_24=dreamleague_season_24,
