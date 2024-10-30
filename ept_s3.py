@@ -106,7 +106,21 @@ def main():
 
                                              team_database=team_database)
 
+    dreamleague_season_24.team_can_finish_between_gs1("PARIVISION", 1, 2)
+    dreamleague_season_24.team_can_finish_between_gs1("Team Liquid", 3, 4)
+    dreamleague_season_24.team_can_finish_between_gs1("Xtreme Gaming", 5, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("BetBoom Team", 5, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("Gaimin Gladiators", 9, 10)
+    dreamleague_season_24.team_can_finish_between_gs1("AVULUS", 11, 12)
+    dreamleague_season_24.team_can_finish_between_gs1("Nigma Galaxy", 13, 16)
+    dreamleague_season_24.team_can_finish_between_gs1("Nouns Esports", 13, 16)
+
     dreamleague_season_24.team_can_finish_between_gs1("Team Falcons", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("Team Waska", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("Tundra Esports", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("Team Spirit", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs1("Talon Esports", 9, 16)
+    dreamleague_season_24.team_can_finish_between_gs1("Azure Ray", 9, 16)
     dreamleague_season_24.team_can_finish_between_gs1("HEROIC", 13, 16)
     dreamleague_season_24.team_can_finish_between_gs1("Palianytsia", 13, 16)
 
