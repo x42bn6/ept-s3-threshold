@@ -69,7 +69,8 @@ def main():
                                                                                num_qualified=2),
                                                          Region.MESWA: Qualifier(region=Region.MESWA,
                                                                                  teams=team_database.get_teams_by_names(
-                                                                                     "Nigma Galaxy"), num_qualified=1),
+                                                                                     "Nigma Galaxy"),
+                                                                                 num_qualified=1),
                                                          Region.CHINA: Qualifier(region=Region.CHINA,
                                                                                  teams=team_database.get_teams_by_names(
                                                                                      "Azure Ray"),
@@ -79,8 +80,7 @@ def main():
                                                                                    "Talon Esports"),
                                                                                num_qualified=1)},
                                              points=[3000, 2500, 2000, 1600, 1200, 1000, 600, 400, 250, 250, 125, 125,
-                                                     70, 70, 30,
-                                                     30],
+                                                     70, 70, 30,30],
                                              gs1_points=[300, 150, 75],
                                              gs2_points=[300],
                                              gs1_team_count=8,

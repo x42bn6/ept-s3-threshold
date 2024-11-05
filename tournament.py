@@ -295,16 +295,16 @@ class SolvedTournament:
         constraints.append(TeamConstraint(team=team, best=best - 1, worst=worst - 1))
 
     def points_to_place(self, points: int) -> int:
-        return self.points.index(points)
+        return self.points_to_place_inner(points, self.points)
 
     def gs1_points_to_place(self, points: int) -> int | None:
-        return self.gs_points_to_place(points, self.gs1_points)
+        return self.points_to_place_inner(points, self.gs1_points)
 
     def gs2_points_to_place(self, points: int) -> int | None:
-        return self.gs_points_to_place(points, self.gs2_points)
+        return self.points_to_place_inner(points, self.gs2_points)
 
     @staticmethod
-    def gs_points_to_place(points: int, point_table: [int]) -> int | None:
+    def points_to_place_inner(points: int, point_table: [int]) -> int | None:
         try:
             return point_table.index(points)
         except ValueError:
