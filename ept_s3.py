@@ -124,6 +124,15 @@ def main():
     dreamleague_season_24.team_can_finish_between_gs1("HEROIC", 13, 14)
     dreamleague_season_24.team_can_finish_between_gs1("Palianytsia", 15, 16)
 
+    dreamleague_season_24.team_can_finish_between_gs2("BetBoom Team", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("PARIVISION", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Team Spirit", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Team Falcons", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Team Liquid", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Team Waska", 1, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Tundra Esports", 4, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Xtreme Gaming", 4, 8)
+
     ept: EPT = EPT(
         dreamleague_season_24=dreamleague_season_24,
         team_database=team_database
