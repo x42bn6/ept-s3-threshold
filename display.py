@@ -64,11 +64,11 @@ class Display:
         output += "|-\n"
         output += f"! '''{(round(max_points) + 1)}'''\n"
         if unoptimised_model.dreamleague_season_24.points_scoring_phases == 1:
-            output += "! Overall\n"
+            output += "! {{Abbr|Fin|Final position}}\n"
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 2:
-            output += "! Overall || GS1\n"
+            output += "! {{Abbr|Fin|Final position}} || GS1\n"
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 3:
-            output += "! Overall || GS1 || GS2\n"
+            output += "! {{Abbr|Fin|Final position}} || GS1 || GS2\n"
         else:
             raise Exception(f"Unknown number of points scoring phases {unoptimised_model.dreamleague_season_24.points_scoring_phases}")
         output += "|-\n"
