@@ -1,3 +1,5 @@
+from struct import Struct
+
 from ortools.sat.python.cp_model import CpSolver
 
 from teams import TeamDatabase, Team
@@ -30,7 +32,7 @@ class Display:
               unoptimised_model: UnoptimisedModel,
               solver: CpSolver,
               dreamleague_season_24: SolvedTournament,
-              team_database: TeamDatabase):
+              team_database: TeamDatabase) -> str:
         team_rows = []
         i = 0
         for team in team_database.get_all_teams():
@@ -51,28 +53,25 @@ class Display:
 
         sorted_team_rows = sorted(team_rows, key=lambda team_row: team_row.total_points, reverse=True)
 
-        print("Printing Liquipedia table")
-        print()
-        print("==What does the threshold scenario look like?==")
-        print(
-            f"This is the following scenario where {{{{Team|{team_to_optimise.name}}}}} fail to qualify with {round(max_points)} points.")
-        print('{| class="wikitable" style="font-size:85%; text-align: center;"')
-        print("!rowspan=\"2\" style=\"min-width:40px\"| '''Place'''")
-        print("!rowspan=\"2\" style=\"min-width:200px\"| '''Team'''")
-        print("!style=\"min-width:50px\"| '''Point'''")
-        print(
-            f"! colspan=\"{unoptimised_model.dreamleague_season_24.points_scoring_phases}\" style=\"min-width:50px\"|{unoptimised_model.dreamleague_season_24.icon}")
-        print("|-")
-        print(f"! '''{(round(max_points) + 1)}'''")
+        output = ""
+        output += "==What does the threshold scenario look like?==\n"
+        output += f"This is the following scenario where {{{{Team|{team_to_optimise.name}}}}} fail to qualify with {round(max_points)} points.\n"
+        output += '{| class="wikitable" style="font-size:85%; text-align: center;"\n'
+        output += "!rowspan=\"2\" style=\"min-width:40px\"| '''Place'''\n"
+        output += "!rowspan=\"2\" style=\"min-width:200px\"| '''Team'''\n"
+        output += "!style=\"min-width:50px\"| '''Point'''\n"
+        output += f"! colspan=\"{unoptimised_model.dreamleague_season_24.points_scoring_phases}\" style=\"min-width:50px\"|{unoptimised_model.dreamleague_season_24.icon}\n"
+        output += "|-\n"
+        output += f"! '''{(round(max_points) + 1)}'''\n"
         if unoptimised_model.dreamleague_season_24.points_scoring_phases == 1:
-            print("! Overall")
+            output += "! Overall\n"
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 2:
-            print("! Overall || GS1")
+            output += "! Overall || GS1\n"
         elif unoptimised_model.dreamleague_season_24.points_scoring_phases == 3:
-            print("! Overall || GS1 || GS2")
+            output += "! Overall || GS1 || GS2\n"
         else:
             raise Exception(f"Unknown number of points scoring phases {unoptimised_model.dreamleague_season_24.points_scoring_phases}")
-        print("|-")
+        output += "|-\n"
         i = 0
 
         def formatted_points(place: int, points: int | None) -> str:
@@ -86,15 +85,17 @@ class Display:
 
         for sorted_team_row in sorted_team_rows:
             if i == 8:
-                print("|-")
-                print('| colspan="99" | Top 8 cutoff')
-            print("|-")
-            print(f"| {(i + 1)}")
-            print(f"|style=\"text-align: left;\"| {{{{Team|{sorted_team_row.team_name}}}}}")
-            print(f"| {sorted_team_row.total_points}")
-            print(f"| {formatted_points(sorted_team_row.dreamleague_season_24_final_placement_place, sorted_team_row.dreamleague_season_24_final_placement_points)}")
-            print(f"| {formatted_points(sorted_team_row.dreamleague_season_24_gs1_place, sorted_team_row.dreamleague_season_24_gs1_points)}")
-            print(f"| {formatted_points(sorted_team_row.dreamleague_season_24_gs2_place, sorted_team_row.dreamleague_season_24_gs2_points)}")
-            print("|-")
+                output += "|-\n"
+                output += '| colspan="99" | Top 8 cutoff\n'
+            output += "|-\n"
+            output += f"| {(i + 1)}\n"
+            output += f"|style=\"text-align: left;\"| {{{{Team|{sorted_team_row.team_name}}}}}\n"
+            output += f"| {sorted_team_row.total_points}\n"
+            output += f"| {formatted_points(sorted_team_row.dreamleague_season_24_final_placement_place, sorted_team_row.dreamleague_season_24_final_placement_points)}\n"
+            output += f"| {formatted_points(sorted_team_row.dreamleague_season_24_gs1_place, sorted_team_row.dreamleague_season_24_gs1_points)}\n"
+            output += f"| {formatted_points(sorted_team_row.dreamleague_season_24_gs2_place, sorted_team_row.dreamleague_season_24_gs2_points)}\n"
+            output += "|-\n"
             i += 1
-        print("|}")
+        output += "|}"
+
+        return output

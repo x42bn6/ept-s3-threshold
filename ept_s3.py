@@ -1,5 +1,6 @@
 from ortools.sat.python import cp_model
 from ortools.sat.python.cp_model import CpModel, CpSolver
+import pyperclip
 
 from display import Display
 from ept import EPT
@@ -131,7 +132,7 @@ def main():
     dreamleague_season_24.team_can_finish_between_gs2("Team Liquid", 1, 8)
     dreamleague_season_24.team_can_finish_between_gs2("Team Waska", 4, 8)
     dreamleague_season_24.team_can_finish_between_gs2("Tundra Esports", 4, 8)
-    dreamleague_season_24.team_can_finish_between_gs2("Xtreme Gaming", 4, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Xtreme Gaming", 6, 8)
 
     ept: EPT = EPT(
         dreamleague_season_24=dreamleague_season_24,
@@ -160,12 +161,15 @@ def main():
             max_team = team
 
     display = Display()
-    display.print(team_to_optimise=max_team,
+    output = display.print(team_to_optimise=max_team,
                   max_points=max_objective_value,
                   unoptimised_model=unoptimised_model,
                   solver=max_solver,
                   dreamleague_season_24=dreamleague_season_24,
                   team_database=team_database)
+    print("Printing Liquipedia table")
+    print(output)
+    pyperclip.copy(output)
 
 
 print("Executing solver")
