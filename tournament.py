@@ -74,6 +74,7 @@ class SolvedTournament:
         self.team_constraints: [TeamConstraint] = []
         self.team_gs1_constraints: [TeamConstraint] = []
         self.team_gs2_constraints: [TeamConstraint] = []
+        self.team_guaranteed_playoff_lb_or_eliminated: [Team] = []
 
     def add_constraints(self, model: CpModel) -> UnoptimisedTournamentModel:
         # x variable
@@ -160,6 +161,13 @@ class SolvedTournament:
             for i in range(team_gs2_constraint.best, team_gs2_constraint.worst + 1):
                 team_sum += gs2_indicators[self.team_database.get_team_index(team_gs2_constraint.team)][i]
             model.Add(team_sum == 1)
+
+        # Guaranteed LB or eliminated - both Grand Finalists cannot come from here
+        lb_or_eliminated_sum = 0
+        for team in self.team_guaranteed_playoff_lb_or_eliminated:
+            for i in [0, 1]:
+                lb_or_eliminated_sum += indicators[self.team_database.get_team_index(team)][i]
+        model.Add(lb_or_eliminated_sum <= 1)
 
         points_scoring_phases = 1
         if self.gs1_team_count is not None:
@@ -293,6 +301,9 @@ class SolvedTournament:
     def team_can_finish_between_inner(self, team_name: str, best: int, worst: int, constraints: [TeamConstraint]):
         team = self.team_database.get_team_by_name(team_name)
         constraints.append(TeamConstraint(team=team, best=best - 1, worst=worst - 1))
+
+    def guaranteed_playoff_lb_or_eliminated(self, *team_names: str):
+        self.team_guaranteed_playoff_lb_or_eliminated = self.team_database.get_teams_by_names(*team_names)
 
     def points_to_place(self, points: int) -> int:
         return self.points_to_place_inner(points, self.points)
