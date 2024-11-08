@@ -141,7 +141,7 @@ def main():
     dreamleague_season_24.team_can_finish_between_gs2("Xtreme Gaming", 7, 7)
     dreamleague_season_24.team_can_finish_between_gs2("Team Waska", 8, 8)
 
-    #dreamleague_season_24.guaranteed_playoff_lb_or_eliminated("Team Falcons")
+    dreamleague_season_24.guaranteed_playoff_lb_or_eliminated("Team Falcons")
 
     ept: EPT = EPT(
         dreamleague_season_24=dreamleague_season_24,
