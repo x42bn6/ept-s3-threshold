@@ -141,6 +141,10 @@ class SolvedTournament:
             model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 1).only_enforce_if(gs2_top_4)
             model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 0).only_enforce_if(gs2_top_4.Not())
 
+            # Bottom GS2 = final result
+            for placement in range(4, 8):
+                model.Add(indicators[team_index][placement] == gs2_indicators[team_index][placement])
+
         # Team constraints
         for team_constraint in self.team_constraints:
             team_sum = 0
@@ -238,7 +242,7 @@ class SolvedTournament:
         all_team_count = len(self.team_database.get_all_teams())
         # x variable
         gs2_indicators: [[BooleanVar]] = [
-            [model.new_bool_var(f'x_{self.name}_gs2_{i}_{j}') for j in range(self.gs2_team_count)]
+            [model.new_bool_var(f'x_{self.name}_gs2_{i}_{j}') for j in range(self.team_count)]
             for i in range(all_team_count)]
         if self.gs2_teams is None:
             print("No GS2 teams setup.  Assuming that any team can obtain points")
@@ -255,14 +259,18 @@ class SolvedTournament:
                 model.Add(sum(gs2_indicators[self.team_database.get_team_index(team)]) == 1)
 
             # One placement per team
-            for placement in range(self.team_count):
-                model.Add(
-                    sum(gs2_indicators[i][placement] for i in range(len(self.team_database.get_all_teams()))) == 1)
+            for placement in range(self.gs2_team_count):
+                row_sum = 0
+                for team in self.gs2_teams:
+                    team_index = self.team_database.get_team_index(team)
+                    row_sum += gs2_indicators[team_index][placement]
+                model.Add(row_sum == 1)
+
         # d variable
         gs2_obtained_points: [IntVar] = [model.new_int_var(0, 99999, f'd_{self.name}_gs2_{i}')
                                          for i in range(all_team_count)]
-        gs2_points_extended: [int] = [0] * self.gs2_team_count
-        for p in range(self.gs2_team_count):
+        gs2_points_extended: [int] = [0] * self.team_count
+        for p in range(self.team_count):
             if p < len(self.gs2_points):
                 gs2_points_extended[p] = self.gs2_points[p]
         for team in self.team_database.get_all_teams():

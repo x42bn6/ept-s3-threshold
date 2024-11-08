@@ -104,7 +104,14 @@ def main():
                                                                                           "Team Waska",
                                                                                           "Tundra Esports",
                                                                                           "Palianytsia"),
-
+                                             gs2_teams=team_database.get_teams_by_names("Team Falcons",
+                                                                                          "BetBoom Team",
+                                                                                          "Team Spirit",
+                                                                                          "PARIVISION",
+                                                                                          "Team Waska",
+                                                                                          "Team Liquid",
+                                                                                          "Xtreme Gaming",
+                                                                                          "Tundra Esports"),
                                              team_database=team_database)
 
     dreamleague_season_24.team_can_finish_between_gs1("PARIVISION", 1, 2)
@@ -129,12 +136,12 @@ def main():
     dreamleague_season_24.team_can_finish_between_gs2("PARIVISION", 2, 3)
     dreamleague_season_24.team_can_finish_between_gs2("Team Spirit", 2, 3)
     dreamleague_season_24.team_can_finish_between_gs2("Team Falcons", 4, 4)
-    dreamleague_season_24.team_can_finish_between_gs2("Team Liquid", 5, 6)
-    dreamleague_season_24.team_can_finish_between_gs2("Tundra Esports", 5, 7)
-    dreamleague_season_24.team_can_finish_between_gs2("Team Waska", 6, 8)
-    dreamleague_season_24.team_can_finish_between_gs2("Xtreme Gaming", 7, 8)
+    dreamleague_season_24.team_can_finish_between_gs2("Tundra Esports", 5, 5)
+    dreamleague_season_24.team_can_finish_between_gs2("Team Liquid", 6, 6)
+    dreamleague_season_24.team_can_finish_between_gs2("Xtreme Gaming", 7, 7)
+    dreamleague_season_24.team_can_finish_between_gs2("Team Waska", 8, 8)
 
-    dreamleague_season_24.guaranteed_playoff_lb_or_eliminated("Team Falcons")
+    #dreamleague_season_24.guaranteed_playoff_lb_or_eliminated("Team Falcons")
 
     ept: EPT = EPT(
         dreamleague_season_24=dreamleague_season_24,
