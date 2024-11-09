@@ -145,6 +145,8 @@ def main():
 
     dreamleague_season_24.team_can_finish_between("BetBoom Team", 1, 3)
     dreamleague_season_24.team_can_finish_between("Team Spirit", 1, 3)
+    dreamleague_season_24.team_can_finish_between("Team Falcons", 1, 3)
+    dreamleague_season_24.team_can_finish_between("PARIVISION", 4, 4)
     dreamleague_season_24.guaranteed_playoff_lb_or_eliminated("Team Falcons", "PARIVISION")
 
     between_dreamleague_season_24_esl_one_bangkok = TransferWindow(team_database=team_database)
