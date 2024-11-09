@@ -4,12 +4,16 @@ from ortools.sat.python.cp_model import CpModel, IntVar
 
 from teams import TeamDatabase, Team
 from tournament import SolvedTournament
+from transfer_window import TransferWindow
 from unoptimised_model import UnoptimisedModel
 
 
 class EPT:
-    def __init__(self, dreamleague_season_24: SolvedTournament, team_database: TeamDatabase):
+    def __init__(self, dreamleague_season_24: SolvedTournament,
+                 between_dreamleague_season_24_esl_one_bangkok: TransferWindow,
+                 team_database: TeamDatabase):
         self.dreamleague_season_24 = dreamleague_season_24
+        self.between_dreamleague_season_24_esl_one_bangkok = between_dreamleague_season_24_esl_one_bangkok
         self.team_database = team_database
 
     def add_constraints(self, model: CpModel) -> UnoptimisedModel:
@@ -20,7 +24,10 @@ class EPT:
         total_points = [model.NewIntVar(0, 99999, f'd_{i}') for i in team_count_range]
         for t in self.team_database.get_all_teams():
             team_index = self.team_database.get_team_index(t)
-            total_points[team_index] = dreamleague_season_24.points[team_index] + dreamleague_season_24.gs1_points[team_index] + dreamleague_season_24.gs2_points[team_index]
+            total_points[team_index] = dreamleague_season_24.points[team_index] + \
+                                       dreamleague_season_24.gs1_points[team_index] + \
+                                       dreamleague_season_24.gs2_points[team_index] + \
+                                       self.between_dreamleague_season_24_esl_one_bangkok.as_table()[team_index]
 
         # Ranks
         aux: [[BooleanVar]] = {(i, j): model.NewBoolVar(f'aux_{i}_{j}') for i in team_count_range for j in
@@ -37,6 +44,7 @@ class EPT:
             ranks[i] = sum(aux[(i, j)] for j in team_count_range)
 
         return UnoptimisedModel(dreamleague_season_24=dreamleague_season_24,
+                                between_dreamleague_season_24_esl_one_bangkok=self.between_dreamleague_season_24_esl_one_bangkok,
                                 total_points=total_points,
                                 ranks=ranks)
 

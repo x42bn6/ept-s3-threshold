@@ -4,6 +4,7 @@ from ortools.sat.python.cp_model import CpSolver
 
 from teams import TeamDatabase, Team
 from tournament import SolvedTournament
+from transfer_window import TransferWindow
 from unoptimised_model import UnoptimisedModel
 
 
@@ -14,7 +15,8 @@ class TeamRow:
                  dreamleague_season_24_gs1_place: int,
                  dreamleague_season_24_gs1_points: int,
                  dreamleague_season_24_gs2_place: int,
-                 dreamleague_season_24_gs2_points: int):
+                 dreamleague_season_24_gs2_points: int,
+                 between_dreamleague_season_24_esl_one_bangkok: int):
         self.team_name = team_name
         self.total_points = total_points
         self.dreamleague_season_24_final_placement_place = dreamleague_season_24_final_placement_place
@@ -23,6 +25,7 @@ class TeamRow:
         self.dreamleague_season_24_gs1_points = dreamleague_season_24_gs1_points
         self.dreamleague_season_24_gs2_place = dreamleague_season_24_gs2_place
         self.dreamleague_season_24_gs2_points = dreamleague_season_24_gs2_points
+        self.between_dreamleague_season_24_esl_one_bangkok = between_dreamleague_season_24_esl_one_bangkok
 
 
 class Display:
@@ -32,6 +35,7 @@ class Display:
               unoptimised_model: UnoptimisedModel,
               solver: CpSolver,
               dreamleague_season_24: SolvedTournament,
+              between_dreamleague_season_24_esl_one_bangkok: TransferWindow,
               team_database: TeamDatabase) -> str:
         team_rows = []
         i = 0
@@ -47,7 +51,8 @@ class Display:
                 dreamleague_season_24_gs1_place=dreamleague_season_24.gs1_points_to_place(dreamleague_season_24_gs1_points),
                 dreamleague_season_24_gs1_points=dreamleague_season_24_gs1_points,
                 dreamleague_season_24_gs2_place=dreamleague_season_24.gs2_points_to_place(dreamleague_season_24_gs2_points),
-                dreamleague_season_24_gs2_points=dreamleague_season_24_gs2_points
+                dreamleague_season_24_gs2_points=dreamleague_season_24_gs2_points,
+                between_dreamleague_season_24_esl_one_bangkok=between_dreamleague_season_24_esl_one_bangkok.as_table()[i]
             ))
             i += 1
 
@@ -57,10 +62,11 @@ class Display:
         output += "==What does the threshold scenario look like?==\n"
         output += f"This is the following scenario where {{{{Team|{team_to_optimise.name}}}}} fail to qualify with {round(max_points)} points.\n"
         output += '{| class="wikitable" style="font-size:85%; text-align: center;"\n'
-        output += "!rowspan=\"2\" style=\"min-width:40px\"| '''Place'''\n"
-        output += "!rowspan=\"2\" style=\"min-width:200px\"| '''Team'''\n"
-        output += "!style=\"min-width:50px\"| '''Point'''\n"
-        output += f"! colspan=\"{unoptimised_model.dreamleague_season_24.points_scoring_phases}\" style=\"min-width:50px\"|{unoptimised_model.dreamleague_season_24.icon}\n"
+        output += "! rowspan=\"2\" style=\"min-width:40px\" | '''Place'''\n"
+        output += "! rowspan=\"2\" style=\"min-width:200px\" | '''Team'''\n"
+        output += "! style=\"min-width:50px\" | '''Point'''\n"
+        output += f"! colspan=\"{unoptimised_model.dreamleague_season_24.points_scoring_phases}\" style=\"min-width:50px\" | {unoptimised_model.dreamleague_season_24.icon}\n"
+        output += "! rowspan=\"2\" | <span title=\"Point changes between DreamLeague Season 24 and ESL One Bangkok\">&hArr;</span>\n"
         output += "|-\n"
         output += f"! '''{(round(max_points) + 1)}'''\n"
         if unoptimised_model.dreamleague_season_24.points_scoring_phases == 1:
@@ -94,6 +100,7 @@ class Display:
             output += f"| {formatted_points(sorted_team_row.dreamleague_season_24_final_placement_place, sorted_team_row.dreamleague_season_24_final_placement_points)}\n"
             output += f"| {formatted_points(sorted_team_row.dreamleague_season_24_gs1_place, sorted_team_row.dreamleague_season_24_gs1_points)}\n"
             output += f"| {formatted_points(sorted_team_row.dreamleague_season_24_gs2_place, sorted_team_row.dreamleague_season_24_gs2_points)}\n"
+            output += f"| {sorted_team_row.between_dreamleague_season_24_esl_one_bangkok}\n"
             output += "|-\n"
             i += 1
         output += "|}"

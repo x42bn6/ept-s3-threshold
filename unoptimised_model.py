@@ -1,5 +1,7 @@
 from ortools.constraint_solver.pywrapcp import BooleanVar, IntVar
 
+from transfer_window import TransferWindow
+
 
 class UnoptimisedTournamentModel:
     def __init__(self, icon: str, points_scoring_phases: int, indicators: [[BooleanVar]], points: [IntVar], gs1_indicators: [[BooleanVar]] = None,
@@ -15,8 +17,11 @@ class UnoptimisedTournamentModel:
 
 
 class UnoptimisedModel:
-    def __init__(self, dreamleague_season_24: UnoptimisedTournamentModel,
+    def __init__(self,
+                 dreamleague_season_24: UnoptimisedTournamentModel,
+                 between_dreamleague_season_24_esl_one_bangkok: TransferWindow,
                  total_points: [IntVar], ranks: [IntVar]):
         self.dreamleague_season_24 = dreamleague_season_24
+        self.between_dreamleague_season_24_esl_one_bangkok = between_dreamleague_season_24_esl_one_bangkok
         self.total_points = total_points
         self.ranks = ranks

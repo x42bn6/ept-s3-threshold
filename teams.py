@@ -26,5 +26,8 @@ class TeamDatabase:
     def get_team_index(self, team: Team) -> int:
         return list(self.teams.keys()).index(team.name)
 
+    def get_team_index_by_team_name(self, team_name: str) -> int:
+        return list(self.teams.keys()).index(team_name)
+
     def get_all_teams(self) -> [Team]:
         return self.teams.values()

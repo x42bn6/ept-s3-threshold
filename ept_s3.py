@@ -8,6 +8,7 @@ from qualifier import Qualifier
 from region import Region
 from teams import Team, TeamDatabase
 from tournament import SolvedTournament
+from transfer_window import TransferWindow
 
 
 def main():
@@ -32,6 +33,7 @@ def main():
         Team("Talon Esports"),
 
         Team("Nouns Esports"),
+        Team("ex-Nouns Esports"),
 
         Team("HEROIC"),
         Team("Team Waska")
@@ -145,8 +147,13 @@ def main():
     dreamleague_season_24.team_can_finish_between("Team Spirit", 1, 3)
     dreamleague_season_24.guaranteed_playoff_lb_or_eliminated("Team Falcons", "PARIVISION")
 
+    between_dreamleague_season_24_esl_one_bangkok = TransferWindow(team_database=team_database)
+    between_dreamleague_season_24_esl_one_bangkok.add_change("Nouns Esports", -30)
+    between_dreamleague_season_24_esl_one_bangkok.add_change("ex-Nouns Esports", 30)
+
     ept: EPT = EPT(
         dreamleague_season_24=dreamleague_season_24,
+        between_dreamleague_season_24_esl_one_bangkok=between_dreamleague_season_24_esl_one_bangkok,
         team_database=team_database
     )
 
@@ -177,6 +184,7 @@ def main():
                   unoptimised_model=unoptimised_model,
                   solver=max_solver,
                   dreamleague_season_24=dreamleague_season_24,
+                  between_dreamleague_season_24_esl_one_bangkok=between_dreamleague_season_24_esl_one_bangkok,
                   team_database=team_database)
     print("Printing Liquipedia table")
     print(output)
