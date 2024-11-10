@@ -144,8 +144,8 @@ def main():
     dreamleague_season_24.team_can_finish_between_gs2("Team Waska", 8, 8)
 
     dreamleague_season_24.team_can_finish_between("BetBoom Team", 1, 2)
-    dreamleague_season_24.team_can_finish_between("Team Spirit", 1, 3)
-    dreamleague_season_24.team_can_finish_between("Team Falcons", 1, 3)
+    dreamleague_season_24.team_can_finish_between("Team Falcons", 1, 2)
+    dreamleague_season_24.team_can_finish_between("Team Spirit", 3, 3)
     dreamleague_season_24.team_can_finish_between("PARIVISION", 4, 4)
     dreamleague_season_24.guaranteed_playoff_lb_or_eliminated("Team Falcons", "PARIVISION", "Team Spirit")
 
