@@ -20,8 +20,10 @@ class UnoptimisedModel:
     def __init__(self,
                  dreamleague_season_24: UnoptimisedTournamentModel,
                  between_dreamleague_season_24_esl_one_bangkok: TransferWindow,
+                 esl_one_bangkok_2024: UnoptimisedTournamentModel,
                  total_points: [IntVar], ranks: [IntVar]):
-        self.dreamleague_season_24 = dreamleague_season_24
+        self.dreamleague_season_24: UnoptimisedTournamentModel = dreamleague_season_24
         self.between_dreamleague_season_24_esl_one_bangkok = between_dreamleague_season_24_esl_one_bangkok
+        self.esl_one_bangkok_2024: UnoptimisedTournamentModel = esl_one_bangkok_2024
         self.total_points = total_points
         self.ranks = ranks

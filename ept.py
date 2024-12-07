@@ -9,15 +9,19 @@ from unoptimised_model import UnoptimisedModel
 
 
 class EPT:
-    def __init__(self, dreamleague_season_24: SolvedTournament,
+    def __init__(self,
+                 dreamleague_season_24: SolvedTournament,
                  between_dreamleague_season_24_esl_one_bangkok: TransferWindow,
+                 esl_one_bangkok_2024: SolvedTournament,
                  team_database: TeamDatabase):
         self.dreamleague_season_24 = dreamleague_season_24
         self.between_dreamleague_season_24_esl_one_bangkok = between_dreamleague_season_24_esl_one_bangkok
+        self.esl_one_bangkok_2024 = esl_one_bangkok_2024
         self.team_database = team_database
 
     def add_constraints(self, model: CpModel) -> UnoptimisedModel:
         dreamleague_season_24 = self.dreamleague_season_24.add_constraints(model)
+        esl_one_bangkok_2024 = self.esl_one_bangkok_2024.add_constraints(model)
 
         team_count = len(self.team_database.get_all_teams())
         team_count_range = range(team_count)
@@ -27,7 +31,9 @@ class EPT:
             total_points[team_index] = dreamleague_season_24.points[team_index] + \
                                        dreamleague_season_24.gs1_points[team_index] + \
                                        dreamleague_season_24.gs2_points[team_index] + \
-                                       self.between_dreamleague_season_24_esl_one_bangkok.as_table()[team_index]
+                                       self.between_dreamleague_season_24_esl_one_bangkok.as_table()[team_index] + \
+                                       esl_one_bangkok_2024.points[team_index] + \
+                                       esl_one_bangkok_2024.gs1_points[team_index]
 
         # Ranks
         aux: [[BooleanVar]] = {(i, j): model.NewBoolVar(f'aux_{i}_{j}') for i in team_count_range for j in
@@ -45,17 +51,18 @@ class EPT:
 
         return UnoptimisedModel(dreamleague_season_24=dreamleague_season_24,
                                 between_dreamleague_season_24_esl_one_bangkok=self.between_dreamleague_season_24_esl_one_bangkok,
+                                esl_one_bangkok_2024=esl_one_bangkok_2024,
                                 total_points=total_points,
                                 ranks=ranks)
 
-    def optimise_for(self, team: Team, unoptimised_model: UnoptimisedModel, model: CpModel):
+    def optimise_for(self, team: Team, unoptimised_model: UnoptimisedModel, model: CpModel, top_n):
         team_index = self.team_database.get_team_index(team)
-        model.Add(unoptimised_model.ranks[team_index] > 8)
+        model.Add(unoptimised_model.ranks[team_index] > top_n)
         model.Maximize(unoptimised_model.total_points[team_index])
 
         solver = cp_model.CpSolver()
         status = solver.Solve(model)
         if status != cp_model.OPTIMAL:
-            print("No optimal solution found, probably unable to finish outside of top 8.")
+            print(f"No optimal solution found, probably unable to finish outside of top {top_n}.")
 
         return [solver, status]

@@ -94,7 +94,8 @@ class SolvedTournament:
                 indicators[team_index][p] * self.points[p] for p in range(len(self.points)))
 
         gs1_indicators, gs1_obtained_points = self.setup_group_stage_1(model)
-        gs2_indicators, gs2_obtained_points = self.setup_group_stage_2(model)
+        gs2_indicators = None
+        gs2_obtained_points = None
 
         # Bind stages together such that if you are in the tournament, you are in GS1
         for team in self.team_database.get_all_teams():
@@ -107,43 +108,12 @@ class SolvedTournament:
             for p in range(self.gs1_team_count, self.team_count):
                 model.Add(indicators[team_index][p] == gs1_indicators[team_index][p])
 
-        # Anyone who finished bottom half in GS 1 (e.g. 8-16) cannot be in GS2
-        for team in self.team_database.get_all_teams():
-            team_index = self.team_database.get_team_index(team)
-            qualified_for_tournament = model.new_bool_var(f"{self.name}_{team_index}_qualified_for_tournament")
-            model.Add(sum(indicators[team_index]) == 1).only_enforce_if(qualified_for_tournament)
-            model.Add(sum(indicators[team_index]) == 0).only_enforce_if(qualified_for_tournament.Not())
-
-            gs1_top = model.new_bool_var(f"{self.name}_{team_index}_gs1_top")
-            model.Add(sum(gs1_indicators[team_index][0:self.gs1_team_count]) == 1).only_enforce_if(gs1_top)
-            model.Add(sum(gs1_indicators[team_index][0:self.gs1_team_count]) == 0).only_enforce_if(gs1_top.Not())
-
-            gs1_bottom = model.new_bool_var(f"{self.name}_{team_index}_gs1_bottom")
-            model.Add(sum(gs1_indicators[team_index][self.gs1_team_count:self.team_count]) == 1).only_enforce_if(
-                gs1_bottom)
-            model.Add(sum(gs1_indicators[team_index][self.gs1_team_count:self.team_count]) == 0).only_enforce_if(
-                gs1_bottom.Not())
-
-            not_qualified_or_gs1_bottom = model.new_bool_var(f"{self.name}_{team_index}_not_qualified_or_gs1_bottom")
-            model.AddBoolOr([qualified_for_tournament.Not(), gs1_bottom]).only_enforce_if(not_qualified_or_gs1_bottom)
-            model.AddBoolAnd([qualified_for_tournament, gs1_bottom.Not()]).only_enforce_if(
-                not_qualified_or_gs1_bottom.Not())
-
-            model.Add(sum(gs2_indicators[team_index]) == 1).only_enforce_if(gs1_top)
-            model.Add(sum(gs2_indicators[team_index]) == 0).only_enforce_if(not_qualified_or_gs1_bottom)
-
-        # If you finish in the top half of GS2, you finish top 4 overall
-        for team in self.team_database.get_all_teams():
-            team_index = self.team_database.get_team_index(team)
-            gs2_top_4 = model.new_bool_var(f"{self.name}_{team_index}_gs2_top_4")
-            model.Add(sum(gs2_indicators[team_index][0:self.playoff_team_count]) == 1).only_enforce_if(gs2_top_4)
-            model.Add(sum(gs2_indicators[team_index][0:self.playoff_team_count]) == 0).only_enforce_if(gs2_top_4.Not())
-            model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 1).only_enforce_if(gs2_top_4)
-            model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 0).only_enforce_if(gs2_top_4.Not())
-
-            # Bottom GS2 = final result
-            for placement in range(4, 8):
-                model.Add(indicators[team_index][placement] == gs2_indicators[team_index][placement])
+        # DreamLeague or ESL One?
+        if self.gs2_team_count is not None:
+            gs2_indicators, gs2_obtained_points = self.setup_group_stage_2(model)
+            self.setup_2_group_stage_tournament(gs1_indicators, gs2_indicators, indicators, model)
+        else:
+            pass
 
         # Team constraints
         for team_constraint in self.team_constraints:
@@ -157,13 +127,6 @@ class SolvedTournament:
             team_sum = 0
             for i in range(team_gs1_constraint.best, team_gs1_constraint.worst + 1):
                 team_sum += gs1_indicators[self.team_database.get_team_index(team_gs1_constraint.team)][i]
-            model.Add(team_sum == 1)
-
-        # GS2 constraints
-        for team_gs2_constraint in self.team_gs2_constraints:
-            team_sum = 0
-            for i in range(team_gs2_constraint.best, team_gs2_constraint.worst + 1):
-                team_sum += gs2_indicators[self.team_database.get_team_index(team_gs2_constraint.team)][i]
             model.Add(team_sum == 1)
 
         # Guaranteed LB or eliminated - both Grand Finalists cannot come from here
@@ -189,6 +152,51 @@ class SolvedTournament:
             gs2_indicators=gs2_indicators,
             gs2_points=gs2_obtained_points
         )
+
+    def setup_2_group_stage_tournament(self, gs1_indicators, gs2_indicators, indicators, model):
+        # Anyone who finished bottom half in GS 1 (e.g. 8-16) cannot be in GS2
+        for team in self.team_database.get_all_teams():
+            team_index = self.team_database.get_team_index(team)
+            qualified_for_tournament = model.new_bool_var(f"{self.name}_{team_index}_qualified_for_tournament")
+            model.Add(sum(indicators[team_index]) == 1).only_enforce_if(qualified_for_tournament)
+            model.Add(sum(indicators[team_index]) == 0).only_enforce_if(qualified_for_tournament.Not())
+
+            gs1_top = model.new_bool_var(f"{self.name}_{team_index}_gs1_top")
+            model.Add(sum(gs1_indicators[team_index][0:self.gs1_team_count]) == 1).only_enforce_if(gs1_top)
+            model.Add(sum(gs1_indicators[team_index][0:self.gs1_team_count]) == 0).only_enforce_if(gs1_top.Not())
+
+            gs1_bottom = model.new_bool_var(f"{self.name}_{team_index}_gs1_bottom")
+            model.Add(sum(gs1_indicators[team_index][self.gs1_team_count:self.team_count]) == 1).only_enforce_if(
+                gs1_bottom)
+            model.Add(sum(gs1_indicators[team_index][self.gs1_team_count:self.team_count]) == 0).only_enforce_if(
+                gs1_bottom.Not())
+
+            not_qualified_or_gs1_bottom = model.new_bool_var(f"{self.name}_{team_index}_not_qualified_or_gs1_bottom")
+            model.AddBoolOr([qualified_for_tournament.Not(), gs1_bottom]).only_enforce_if(not_qualified_or_gs1_bottom)
+            model.AddBoolAnd([qualified_for_tournament, gs1_bottom.Not()]).only_enforce_if(
+                not_qualified_or_gs1_bottom.Not())
+
+            model.Add(sum(gs2_indicators[team_index]) == 1).only_enforce_if(gs1_top)
+            model.Add(sum(gs2_indicators[team_index]) == 0).only_enforce_if(not_qualified_or_gs1_bottom)
+        # If you finish in the top half of GS2, you finish top 4 overall
+        for team in self.team_database.get_all_teams():
+            team_index = self.team_database.get_team_index(team)
+            gs2_top_4 = model.new_bool_var(f"{self.name}_{team_index}_gs2_top_4")
+            model.Add(sum(gs2_indicators[team_index][0:self.playoff_team_count]) == 1).only_enforce_if(gs2_top_4)
+            model.Add(sum(gs2_indicators[team_index][0:self.playoff_team_count]) == 0).only_enforce_if(gs2_top_4.Not())
+            model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 1).only_enforce_if(gs2_top_4)
+            model.Add(sum(indicators[team_index][0:self.playoff_team_count]) == 0).only_enforce_if(gs2_top_4.Not())
+
+            # Bottom GS2 = final result
+            for placement in range(4, 8):
+                model.Add(indicators[team_index][placement] == gs2_indicators[team_index][placement])
+
+        # GS2 constraints
+        for team_gs2_constraint in self.team_gs2_constraints:
+            team_sum = 0
+            for i in range(team_gs2_constraint.best, team_gs2_constraint.worst + 1):
+                team_sum += gs2_indicators[self.team_database.get_team_index(team_gs2_constraint.team)][i]
+            model.Add(team_sum == 1)
 
     def setup_group_stage_1(self, model):
         # GS1
